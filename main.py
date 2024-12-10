@@ -18,7 +18,7 @@ def main(args):
     set_seed(args.seed)
 
     # create results directory
-    results_dir = os.path.join('VGAT-main/results', args.model, args.dataset)
+    results_dir = os.path.join('./results', args.model, args.dataset)
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 
