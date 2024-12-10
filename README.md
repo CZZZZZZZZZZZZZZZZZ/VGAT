@@ -9,13 +9,55 @@ The PyTorch implementation of Vision Genomic Answering-Guided Transformer (VGAT)
 - Python (3.10.14), numpy (1.25.0), pandas (2.2.2), torch (2.3.1), scikit-learn (1.5.0), scipy (1.13.1),
 - （Used for obtaining BulkRNA embedding） jax(0.4.19), jaxlib(0.4.19+cudnn86), joblib(1.3.2), dm-haiku(0.0.10), pydantic(1.10.5)
 
-### Downloading TCGA Data and Pathways Compositions 
-To download diagnostic WSIs (formatted as .svs files), molecular feature data and other clinical metadata, please refer  to the [NIH Genomic Data Commons Data Portal](https://portal.gdc.cancer.gov)and the [cBioPortal](https://www.cbioportal.org/). WSIs for each cancer type can be downloaded using the [GDC Data Transfer Tool](https://docs.gdc.cancer.gov/Data_Transfer_Tool/Users_Guide/Data_Download_and_Upload/). 
-## Processing Whole Slide Images 
-To process Whole Slide Images (WSIs), first, the tissue regions in each biopsy slide are segmented using Otsu's Segmentation on a downsampled WSI using OpenSlide. The 256 x 256 patches without spatial overlapping are extracted from the segmented tissue regions at the desired magnification. Consequently, an SSL pretrained Swin Transformer [CTransPath](https://github.com/Xiyue-Wang/TransPath) is used to encode raw image patches into 768-dim feature vectors, which we then save as .pt files for each WSI. The extracted features then serve as input (in a .pt file) to the network. All pre-processing of WSIs is done using the [CLAM toolbox](https://github.com/mahmoodlab/CLAM).
+### Prepare your data
+#### WSIs
+1. Download diagnostic WSIs from [TCGA](https://portal.gdc.cancer.gov/)
+2. Use the WSI processing tool provided by [CLAM](https://github.com/mahmoodlab/CLAM) to extract resnet-50 pretrained 1024-dim feature for each 256 $\times$ 256 patch (20x), which we then save as `.pt` files for each WSI. So, we get one `pt_files` folder storing `.pt` files for all WSIs of one study.
 
-## Transcriptomics and Pathway Compositions
-We downloaded raw RNA-seq abundance data for the TCGA cohorts from the [Xena database](https://www.nature.com/articles/s41587-020-0546-8) and performed normalization in the dataset class. The raw data is included as CSV files [`datasets_csv`](https://github.com/ajv012/SurvPath/tree/main/datasets_csv/raw_rna_data/combine). Xena database was also used to access disease specific survival and associated censorhsip. Using the Reactome and MSigDB Hallmarks pathway compositions, we selected pathways that had more than 90% of transcriptomics data available. The compositions can be found at [`metadata`](https://github.com/ajv012/SurvPath/blob/main/datasets_csv/metadata/combine_signatures.csv).  
+#### Genomics embeeding
+1. Download RNA-seq data matching with WSIs from [TCGA](https://portal.gdc.cancer.gov/)
+2. Use the [BulkRNABert](https://github.com/instadeepai/multiomics-open-research)  to preprocessing and get geneomics embedding,which we then save as `.pt` files for each patient.If a patient has multiple gene sequencing records, only one is retained.
+
+The final structure of datasets should be as following:
+```bash
+DATA_ROOT_DIR/
+    └──dataset1/    
+        └──feats_pt/
+          ├── slide_id_1.pt
+          ├── slide_id_2.pt
+          └── ...
+        └──gene_pt/
+          ├── case_id_1.pt
+          ├── case_id_2.pt
+          └── ...
+    └──dataset2/    
+        └──feats_pt/
+          └── ...
+        └──gene_pt/
+          └── ...
+    └──.... 
+```
+DATA_ROOT_DIR is the base directory of your all datasets (BLCA,BRCA,GBMLGG,LUAD,UCEC)
+
+## Training-Validation Splits
+Splits for each cancer type are found in the `splits/5foldcv ` folder, which are randomly partitioned each dataset using 5-fold cross-validation. Each one contains splits_{k}.csv for k = 0 to 4. 
+
+#### Cluster centroid vector
+As the EM algorithm relies on cluster centroids derived from K-means for further computations, to prevent validation set leakage, we have prepared cluster centroid vectors for each of the five-fold cross-validation training sets. If you are using the same split as us, no additional work is required. If you wish to change the splits, you can refer to [PANTHER](https://github.com/mahmoodlab/PANTHER) to obtain the cluster centroid vectors.
+
+## Running Experiments
+
+use the following generic command-line and specify the arguments:
+```bash
+CUDA_VISIBLE_DEVICES=<DEVICE_ID> python main.py \
+--data_root_dir <DATA_ROOT_DIR> \
+--dataset <SPLITS_FOR_CANCER_TYPE>
+--model_type motcat \
+--modal bert_coattn \
+--model vgat \
+--select em \
+--loss nll_surv_kl \
+```
 
 
 
