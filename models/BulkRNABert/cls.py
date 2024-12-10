@@ -19,7 +19,7 @@ device = jax.devices("gpu")[1]
 parameters, forward_fn, tokenizer, config = get_pretrained_model(
     model_name="bulk_rna_bert_tcga",
     embeddings_layers_to_save=(4,),
-    checkpoint_directory="/home/czz/pytorch_code/CMTA/CMTA-main/models/bertRNA/checkpoints/",
+    checkpoint_directory="VGAT-main/models/BulkRNABert/checkpoints",
 )
 forward_fn = hk.transform(forward_fn)
 
@@ -27,7 +27,7 @@ forward_fn = hk.transform(forward_fn)
 parameters = jax.device_put(parameters, device)
 
 # Get bulk RNASeq data and tokenize it
-rna_seq_df = pd.read_csv("/home/dataset2/hmh_data/TCGA_txt/omic/bertcsv/GBMLGG/GBMLGG_preprocessed.csv")
+rna_seq_df = pd.read_csv("./tcga_blca/blca_preprocessed.csv")
 rna_name = rna_seq_df["identifier"]
 rna_seq_array = preprocess_rna_seq_for_bulkrnabert(rna_seq_df, config)
 
@@ -35,7 +35,7 @@ batch_size = 1
 num_samples = len(rna_seq_array)
 
 # 外部指定的保存目录
-save_directory = "/home/dataset2/hmh_data/TCGA_txt/omic/bert_feature/all/GBMLGG"
+save_directory = ""
 os.makedirs(save_directory, exist_ok=True)
 
 # 使用指定设备的上下文管理器
