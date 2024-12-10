@@ -52,7 +52,6 @@ use the following generic command-line and specify the arguments:
 CUDA_VISIBLE_DEVICES=<DEVICE_ID> python main.py \
 --data_root_dir <DATA_ROOT_DIR> \
 --dataset <SPLITS_FOR_CANCER_TYPE>
---model_type motcat \
 --modal bert_coattn \
 --model vgat \
 --select em \
