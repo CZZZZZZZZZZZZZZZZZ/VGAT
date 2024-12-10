@@ -55,7 +55,7 @@ CUDA_VISIBLE_DEVICES=<DEVICE_ID> python main.py \
 --modal bert_coattn \
 --model vgat \
 --select em \
---loss nll_surv_kl \
+--loss nll_surv_kl 
 ```
 
 
