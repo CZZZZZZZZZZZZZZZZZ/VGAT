@@ -25,7 +25,6 @@ class SoftFilterLayer(nn.Module):
         self.device = device
             
     def forward(self,x):
-        torch.cuda.set_device(0)
         logits = self.layers(x)
         h = torch.mul(x,logits).to(self.device)
         return h
