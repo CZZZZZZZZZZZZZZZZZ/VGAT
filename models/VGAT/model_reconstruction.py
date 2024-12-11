@@ -13,7 +13,7 @@ from .reconstruction_attention_modules import *
 
 class SoftFilterLayer(nn.Module):
     
-    def __init__(self,dim,hidden_size,deep=1,device = 'cuda:0') -> None:
+    def __init__(self,dim,hidden_size,deep=1,device = 'cuda') -> None:
         super().__init__()
         layers = []
         for i in range(deep):
