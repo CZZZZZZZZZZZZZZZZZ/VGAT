@@ -1,4 +1,4 @@
-# VGAT: A Cancer Survival Analysis Framework Transitioning from Generative Visual Question Answering to Genomics Reconstruction
+# VGAT: A Cancer Survival Analysis Framework Transitioning from Generative Visual Question Answering to Genomics Reconstruction (ICME2025)
 The PyTorch implementation of Vision Genomic Answering-Guided Transformer (VGAT) as described in the paper "VGAT: A Cancer Survival Analysis Framework Transitioning from Generative Visual Question Answering to Genomics Reconstruction."
 
 <img src="VGAT.png" width="1500px" align="center" />
